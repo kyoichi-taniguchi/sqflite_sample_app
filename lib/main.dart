@@ -1,75 +1,131 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:io';
 
-void main() {
-  runApp(const MyApp());
+import 'package:async/async.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+
+// class for data of application
+class TodoItem {
+  final int? id;
+  final String content;
+
+  final bool isDone;
+
+  final DateTime createdAt;
+  // contractor
+  TodoItem({
+   this.id,
+   required this.content,
+   this.isDone = false,
+    required this.createdAt,
+  });
+
+  TodoItem.fromJsonMap(Map<String, dynamic> map)
+    : id = map['id'] as int,
+      content = map['content'] as String,
+      isDone = map['isDone'] == 1,
+      createdAt =
+          DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int);
+
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+main() {
+  runApp(SqliteExample());
+}
 
-  // This widget is the root of your application.
+class SqliteExample extends StatefulWidget {
+  const SqliteExample({Key? key}) : super(key: key);
+
+  @override
+  _SqliteExampleState createState() => _SqliteExampleState();
+}
+
+
+
+
+
+
+class _SqliteExampleState extends State<SqliteExample> {
+
+  // define file name
+  static const kDbFileName = 'sqflite_ex.db';
+  // define table name
+  static const kDbTableName = 'example_tbl';
+
+  late Database _db;
+  List<TodoItem> _todos = [];
+
+  // create db table
+  Future<void> _initDb() async {
+    // create folder
+    final dbFolder = await getDatabasesPath();
+    if (!await Directory(dbFolder).exists()) {
+      await Directory(dbFolder).create(recursive: true);
+    }
+
+    // DataBase Path
+    final dbPath = join(dbFolder, kDbFileName);
+
+    // open dataBase and create table (if not exist)
+    this._db = await openDatabase(
+        dbPath,
+        version: 1,
+        onCreate: (Database db, int version) async {
+          await db.execute('''
+          CREATE TABLE $kDbTableName(
+            id INTEGER PRIMARY KEY,
+            isDone BIT NOT NULL,
+            content TEXT,
+            createdAt INT)
+            ''');
+        },
+    );
+
+    // retrieves rows
+    Future<void> _getTodoItems() async {
+      // from json to List
+      final List<Map<String, dynamic>> jsons =
+        await this._db.rawQuery('SELECT * FROM $kDbTableName');
+      print('${jsons.length} rows retrieves from db!');
+      this._todos = jsons.map((json) => TodoItem.fromJsonMap(json)).toList();
+    }
+
+  }
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-
-        title: Text(widget.title),
-      ),
-      body: Center(
-
-        child: Column(
-
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+      title: 'Example',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('todo example'),
+        ),
+        body: ListView(
+          children: this._todos.map(_itemToListTile).toList(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+
+
+
+  ListTile _itemToListTile(TodoItem todo) => ListTile(
+    title: Text(todo.content),
+  );
+
+
+
+
+
+
+
 }
