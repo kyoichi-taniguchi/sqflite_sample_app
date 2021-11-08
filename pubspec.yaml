@@ -31,8 +31,8 @@ dependencies:
     sdk: flutter
 
   sqflite:
+  path_provider:
   path:
-
   english_words: ^4.0.0
 
 
