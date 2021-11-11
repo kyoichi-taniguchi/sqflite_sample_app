@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:line_analytics_app/line_analysis.dart';
+import 'package:line_analytics_app/Model/create_talk_list.dart';
+import 'package:line_analytics_app/Model/line_analysis.dart';
+import 'package:line_analytics_app/Model/talk_class.dart';
 
 Future<String> getFileData(String path) async {
   return await rootBundle.loadString(path);
@@ -20,12 +22,17 @@ class _txtFileAppState extends State<txtFileApp> {
 
   String _data = '';
 
+  String fileName1 = 'assets/line_data.txt';
+  String fileName2 = 'assets/[LINE] しのちゃんとのトーク.txt';
+
 
 
   @override
   Widget build(BuildContext context) {
 
-    getFileData('assets/line_data.txt').then((value) {
+
+
+    getFileData(fileName1).then((value) {
       setState(() {
         _data = value;
       });
@@ -38,6 +45,7 @@ class _txtFileAppState extends State<txtFileApp> {
         child:
           talkList == null ? Text('please tap')
               : ListView.builder(
+            itemCount: talkList!.length,
             itemBuilder: (BuildContext context, int index) {
               return Container(
                 child:
@@ -55,7 +63,9 @@ class _txtFileAppState extends State<txtFileApp> {
 
   void loadButton() {
     setState(() {
-      talkList = lineAnalysis();
+      talkList = createTalkList(_data);
+      searchName(talkList!);
     });
   }
+
 }

@@ -8,8 +8,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:line_analytics_app/main.dart';
-import 'package:line_analytics_app/root_app.dart';
+import 'package:line_analytics_app/View/main.dart';
+import 'package:line_analytics_app/View/root_app.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
