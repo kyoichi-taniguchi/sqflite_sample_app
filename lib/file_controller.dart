@@ -44,8 +44,7 @@ class _FileAppState extends State<FileApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text('file入出力'),
         ),
@@ -83,7 +82,6 @@ class _FileAppState extends State<FileApp> {
             ),
           ],
         ),
-      ),
     );
   }
 }
