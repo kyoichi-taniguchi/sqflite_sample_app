@@ -25,6 +25,8 @@ class _txtFileAppState extends State<txtFileApp> {
   String fileName1 = 'assets/line_data.txt';
   String fileName2 = 'assets/[LINE] しのちゃんとのトーク.txt';
 
+  int page = 0;
+
 
 
   @override
@@ -40,25 +42,40 @@ class _txtFileAppState extends State<txtFileApp> {
     return Scaffold(
       appBar: AppBar(
         title: Text('txt file'),
+        actions: <Widget>[
+          IconButton(onPressed: () {page = 1;}, icon: Icon(Icons.analytics)),
+          IconButton(onPressed: () {page = 0;}, icon: Icon(Icons.list)),
+        ],
       ),
       body: Center(
-        child:
-          talkList == null ? Text('please tap')
-              : ListView.builder(
-            itemCount: talkList!.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                child:
-                    Text('${talkList![index].time} : ${talkList![index].name} : ${talkList![index].content}'),
-              );
-            }
-        ),
-      ),
+        child: page == 0 ? talkListBuilder(talkList) : Text(printNumberOfTalks(talkList!))),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: loadButton,
       ),
     );
+  }
+
+  Widget talkListBuilder(List<Talk>? talkList) {
+    if (talkList == null) {
+      return const Text('please tap');
+    } else {
+      return ListView.builder(
+          itemCount: talkList.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Text('${talkList[index].time} : ${talkList[index].name} : ${talkList[index].content}');
+          }
+      );
+    }
+  }
+
+  String printNumberOfTalks (List<Talk> talkList) {
+    List<NumberOfTalks> numbers = searchName(talkList);
+    String n = '';
+    for (var i in numbers) {
+      n = '$n${i.name} : ${i.n}件\n';
+    }
+    return n;
   }
 
   void loadButton() {

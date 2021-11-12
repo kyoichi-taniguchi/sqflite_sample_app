@@ -13,7 +13,7 @@ class NumberOfTalks {
       );
 }
 
-searchName(List<Talk> talkList) {
+List<NumberOfTalks> searchName(List<Talk> talkList) {
   List<NumberOfTalks> numbers = [];
   List<String> lNumbers = [];
   int c = 0;
@@ -32,10 +32,6 @@ searchName(List<Talk> talkList) {
     } else{
       numbers[1].n++;
     }
-  }
-
-  for (var i in numbers) {
-    print('${i.name} : ${i.n}件');
   }
 
   return numbers;
