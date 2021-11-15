@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:line_analytics_app/View/read_txt_file.dart';
+import 'package:line_analytics_app/View/line_analysis_view.dart';
 import 'todo_sample_app.dart';
 
 class MyHomePage extends StatefulWidget {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:line_analytics_app/Model/create_talk_list.dart';
 import 'package:line_analytics_app/Model/line_analysis.dart';
 import 'package:line_analytics_app/Model/talk_class.dart';
+import 'package:line_analytics_app/Model/talks_db_controller.dart';
 
 Future<String> getFileData(String path) async {
   return await rootBundle.loadString(path);
@@ -26,6 +27,7 @@ class _txtFileAppState extends State<txtFileApp> {
   String fileName2 = 'assets/[LINE] しのちゃんとのトーク.txt';
 
   int page = 0;
+  TalksDb db = TalksDb();
 
 
 
@@ -39,11 +41,18 @@ class _txtFileAppState extends State<txtFileApp> {
         _data = value;
       });
     });
+
+
     return Scaffold(
       appBar: AppBar(
         title: Text('txt file'),
         actions: <Widget>[
-          IconButton(onPressed: () {page = 1;}, icon: Icon(Icons.analytics)),
+          IconButton(
+              onPressed: () {
+                page = 1;
+                db.checkDb();
+                },
+              icon: Icon(Icons.analytics)),
           IconButton(onPressed: () {page = 0;}, icon: Icon(Icons.list)),
         ],
       ),
@@ -70,6 +79,7 @@ class _txtFileAppState extends State<txtFileApp> {
   }
 
   String printNumberOfTalks (List<Talk> talkList) {
+    //db.checkDb();
     List<NumberOfTalks> numbers = searchName(talkList);
     String n = '';
     for (var i in numbers) {
@@ -82,7 +92,9 @@ class _txtFileAppState extends State<txtFileApp> {
     setState(() {
       talkList = createTalkList(_data);
       searchName(talkList!);
+      db.createTable(talkList!);
     });
   }
 
 }
+

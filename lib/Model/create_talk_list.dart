@@ -25,6 +25,10 @@ List<Talk> createTalkList(String strData) {
       talkRow.add('add');
     }
 
+    if (talkRow == null) {
+      talkRow = ['add', 'add', 'add'];
+    }
+
     // Talk型に変換
     Talk tmpTalk = Talk(talkRow[0], talkRow[1], talkRow[2]);
     notFormatTalkList.add(tmpTalk);

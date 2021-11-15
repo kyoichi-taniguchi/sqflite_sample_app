@@ -74,7 +74,7 @@ class _SqliteExampleState extends State<SqliteExample> {
     final dbPath = join(dbFolder, kDbFileName);
 
     // open dataBase and create table (if not exist)
-    this._db = await openDatabase(
+    _db = await openDatabase(
       dbPath,
       version: 1,
       onCreate: (Database db, int version) async {
