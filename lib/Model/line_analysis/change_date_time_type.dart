@@ -1,5 +1,5 @@
 import 'package:intl/intl.dart';
-import 'package:line_analytics_app/Model/talk_class.dart';
+import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
 
 class tTalk {
   final DateTime time;

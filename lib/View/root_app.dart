@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:line_analytics_app/View/line_analysis_view.dart';
-import 'todo_sample_app.dart';
+import 'package:line_analytics_app/View/read_file_view.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key,required this.title}) : super(key: key);
@@ -16,7 +16,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: widget.title,
-      home: txtFileApp()
+      home: FilePickerDemo(),
     );
   }
 }

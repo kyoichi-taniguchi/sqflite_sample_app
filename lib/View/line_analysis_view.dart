@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
-import 'package:line_analytics_app/Model/change_date_time_type.dart';
-import 'package:line_analytics_app/Model/create_talk_list.dart';
-import 'package:line_analytics_app/Model/line_analysis.dart';
-import 'package:line_analytics_app/Model/talk_class.dart';
-import 'package:line_analytics_app/Model/talks_db_controller.dart';
+import 'package:line_analytics_app/Model/line_analysis/change_date_time_type.dart';
+import 'package:line_analytics_app/Model/line_analysis/create_talk_list.dart';
+import 'package:line_analytics_app/Model/line_analysis/line_analysis.dart';
+import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
+import 'package:line_analytics_app/Model/database/talks_db_controller.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
 Future<String> getFileData(String path) async {

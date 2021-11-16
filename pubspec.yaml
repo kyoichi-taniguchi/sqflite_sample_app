@@ -38,6 +38,7 @@ dependencies:
   english_words: ^4.0.0
   intl: any
   charts_flutter: any
+  file_picker: any
 
 
 

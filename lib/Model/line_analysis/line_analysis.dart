@@ -1,8 +1,8 @@
 
 
 import 'package:intl/intl.dart';
-import 'package:line_analytics_app/Model/change_date_time_type.dart';
-import 'package:line_analytics_app/Model/talk_class.dart';
+import 'package:line_analytics_app/Model/line_analysis/change_date_time_type.dart';
+import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
 
 
 class NumberOfTalks {

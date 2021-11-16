@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
-import 'package:line_analytics_app/Model/talk_class.dart';
-import 'package:line_analytics_app/Model/talks_db_model.dart';
+import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
+import 'package:line_analytics_app/Model/database/talks_db_model.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
