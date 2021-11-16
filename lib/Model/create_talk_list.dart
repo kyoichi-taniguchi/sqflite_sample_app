@@ -23,9 +23,7 @@ List<Talk> createTalkList(String strData) {
     }
     else if (talkRow.length == 2) {
       talkRow.add('add');
-    }
-
-    if (talkRow == null) {
+    } else if (talkRow.isEmpty) {
       talkRow = ['add', 'add', 'add'];
     }
 
@@ -59,24 +57,16 @@ List<Talk> formatTalkList(List<Talk> data) {
     Iterable<Match> matches = exp.allMatches(row.time);
     for (Match m in matches) {
       row.time = data[dateN].time + row.time;
-      formattedTalkList.add(row);
+      //formattedTalkList.add(row);
     }
 
     // 改行されたトークを検索
-    // リストの長さが3ではない特殊な場合
-    if (row.name == 'add') {
-      // 日時ではない
-      if (i != dateN) {
-        // 文字が存在する
-        if (row.time != '') {
-          //print(talkList2[i-1].content);
-          //print('a$i b${dt.time}c${dt.name}d${dt.content}e');
-          //print(row.time);
+    // リストの長さが3ではないまたは日時ではない場合
+    if (row.name == 'add' || row.content == 'add' || i == dateN) {
           // 次が日時付きだったら、前のcontentに追加
-
-
-        }
-      }
+      } else {
+      //print(data[i].content);
+      formattedTalkList.add(row);
     }
 
 

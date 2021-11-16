@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:intl/intl.dart';
+import 'package:line_analytics_app/Model/change_date_time_type.dart';
 import 'package:line_analytics_app/Model/create_talk_list.dart';
 import 'package:line_analytics_app/Model/line_analysis.dart';
 import 'package:line_analytics_app/Model/talk_class.dart';
@@ -20,6 +22,7 @@ class txtFileApp extends StatefulWidget {
 class _txtFileAppState extends State<txtFileApp> {
 
   List<Talk>?  talkList;
+  List<tTalk>? ttalkList;
 
   String _data = '';
 
@@ -50,7 +53,7 @@ class _txtFileAppState extends State<txtFileApp> {
           IconButton(
               onPressed: () {
                 page = 1;
-                db.checkDb();
+                //db.checkDb();
                 },
               icon: Icon(Icons.analytics)),
           IconButton(onPressed: () {page = 0;}, icon: Icon(Icons.list)),
@@ -66,13 +69,14 @@ class _txtFileAppState extends State<txtFileApp> {
   }
 
   Widget talkListBuilder(List<Talk>? talkList) {
-    if (talkList == null) {
+    if (ttalkList == null) {
       return const Text('please tap');
     } else {
       return ListView.builder(
-          itemCount: talkList.length,
+          itemCount: ttalkList!.length,
           itemBuilder: (BuildContext context, int index) {
-            return Text('${talkList[index].time} : ${talkList[index].name} : ${talkList[index].content}');
+            return Text('${DateFormat('yyyy年MM月dd日HH:mm').format(ttalkList![index].time)} : '
+                '${ttalkList![index].name} : ${ttalkList![index].content}');
           }
       );
     }
@@ -92,7 +96,11 @@ class _txtFileAppState extends State<txtFileApp> {
     setState(() {
       talkList = createTalkList(_data);
       searchName(talkList!);
-      db.createTable(talkList!);
+      //db.createTable(talkList!);
+
+      ttalkList = changeListType(talkList!);
+      countNumberOfTalks(ttalkList!);
+
     });
   }
 
