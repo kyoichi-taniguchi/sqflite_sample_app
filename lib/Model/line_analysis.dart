@@ -41,7 +41,7 @@ List<NumberOfTalks> searchName(List<Talk> talkList) {
   return numbers;
 }
 
-void countNumberOfTalks(List<tTalk> ttalkList) {
+List<NumberOfTalks> countNumberOfTalks(List<tTalk> ttalkList) {
   List<NumberOfTalks> talkN = [];
   List<String> talkDate = [];
 
@@ -56,9 +56,10 @@ void countNumberOfTalks(List<tTalk> ttalkList) {
   }
 
   for (var m in talkN) {
-    print('${m.date.year}/${m.date.month}/${m.date.day} : ${m.name} : ${m.n}');
+    print('${m.date.year}/${m.date.month} : ${m.n}');
   }
 
+  return talkN;
 }
 
 
