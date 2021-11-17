@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_analytics_app/Model/io/share_extention.dart';
 import 'package:line_analytics_app/View/line_analysis_view.dart';
 import 'package:line_analytics_app/View/read_file_view.dart';
 
@@ -16,7 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: widget.title,
-      home: FilePickerDemo(),
+      home: LineAnalysisView(),
     );
   }
 }

@@ -39,6 +39,7 @@ dependencies:
   intl: any
   charts_flutter: any
   file_picker: any
+  receive_sharing_intent: any
 
 
 

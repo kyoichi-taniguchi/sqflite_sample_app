@@ -13,23 +13,27 @@ Future<String> getFileData(String path) async {
 }
 
 
-class txtFileApp extends StatefulWidget {
-  const txtFileApp({Key? key}) : super(key: key);
+class LineAnalysisView extends StatefulWidget {
+  const LineAnalysisView({Key? key}) : super(key: key);
 
   @override
-  _txtFileAppState createState() => _txtFileAppState();
+  _LineAnalysisViewState createState() => _LineAnalysisViewState();
 }
 
-class _txtFileAppState extends State<txtFileApp> {
+class _LineAnalysisViewState extends State<LineAnalysisView> {
 
   List<Talk>?  talkList;
   List<tTalk>? ttalkList;
   List<NumberOfTalks> talkN = [];
 
+
   String _data = '';
 
   String fileName1 = 'assets/line_data.txt';
   String fileName2 = 'assets/[LINE] しのちゃんとのトーク.txt';
+
+  bool isDone = false;
+
 
   int page = 0;
   TalksDb db = TalksDb();
@@ -41,7 +45,8 @@ class _txtFileAppState extends State<txtFileApp> {
 
 
 
-    getFileData(fileName2).then((value) {
+
+    getFileData(fileName1).then((value) {
       setState(() {
         _data = value;
       });
@@ -50,7 +55,7 @@ class _txtFileAppState extends State<txtFileApp> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('txt file'),
+        title: Text('LINE解析アプリ'),
         actions: <Widget>[
           IconButton(
               onPressed: () {page = 1;},
@@ -61,11 +66,13 @@ class _txtFileAppState extends State<txtFileApp> {
       body: Center(
         child: switchWidget(page)),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
+        child: isDone ? Icon(Icons.done) : Icon(Icons.play_arrow),
         onPressed: loadButton,
       ),
     );
   }
+
+
 
   Widget talkListBuilder(List<Talk>? talkList) {
     if (ttalkList == null) {
@@ -94,14 +101,12 @@ class _txtFileAppState extends State<txtFileApp> {
 
   Widget printNumberOfTalks (List<Talk> talkList) {
     //db.checkDb();
-    List<NumberOfTalks> numbers = searchName(talkList);
     String n = '';
-    for (var i in numbers) {
-      n = '$n${i.name} : ${i.n}件\n';
-    }
+
 
     for (var m in talkN) {
-      n = n + '\n${m.date.year}/${m.date.month} : ${m.n}';
+      n = n + '\n${m.date.year}年${m.date.month}月 \n'
+          '${m.name1} : ${m.n1}件, ${m.name2} : ${m.n2}件';
     }
 
 
@@ -110,15 +115,15 @@ class _txtFileAppState extends State<txtFileApp> {
 
 
   void loadButton() {
-    setState(() {
+
+    if (!isDone) {
       talkList = createTalkList(_data);
-      searchName(talkList!);
       //db.createTable(talkList!);
 
       ttalkList = changeListType(talkList!);
       talkN = countNumberOfTalks(ttalkList!);
-
-    });
+      isDone = true;
+    }
   }
 
 }
