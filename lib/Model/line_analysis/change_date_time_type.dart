@@ -45,7 +45,7 @@ tTalk changeTime(Talk talk) {
   return ttalk;
 }
 
-List<tTalk> changeListType(List<Talk> talkList) {
+Future<List<tTalk>> changeListType(List<Talk> talkList) async {
   List<tTalk> talks = [];
 
   for (var m in talkList) {

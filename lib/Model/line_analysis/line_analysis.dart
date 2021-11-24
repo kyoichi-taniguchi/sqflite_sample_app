@@ -1,8 +1,11 @@
 
 
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
+import 'package:line_analytics_app/Model/io/raed_assets_file.dart';
 import 'package:line_analytics_app/Model/line_analysis/change_date_time_type.dart';
 import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
+import 'package:line_analytics_app/View/line_analysis_view.dart';
 
 
 class NumberOfTalks {
@@ -20,26 +23,39 @@ class NumberOfTalks {
       this.n2,
       );
 }
+String searchFriendName(String data) {
+  List<String> dataList = data.split('\n');
+  String nameData = dataList[0].split(' ')[1];
+  int needless = nameData.length - 'とのトーク履歴'.length -1;
+  String friendName = nameData.substring(0, needless);
 
+  return friendName;
+}
 
-List<String> searchName(List<tTalk> ttalkList) {
+Future<List<String>> searchName(List<tTalk> ttalkList) async {
   List<String> nameList = [];
+  String _data = '';
+  _data = await FileController().readFile();
+  nameList.add(searchFriendName(_data));
   int c = 0;
-  for ( var i=0; c < 2; i++) {
-    if (nameList.contains(ttalkList[i].name) == false) {
+  for ( var i=0; c < 1; i++) {
+    if (nameList[0] != ttalkList[i].name) {
       nameList.add(ttalkList[i].name);
       c++;
     }
   }
+  print(nameList);
 
 
   return nameList;
 }
 
-List<NumberOfTalks> countNumberOfTalks(List<tTalk> ttalkList) {
+
+
+Future<List<NumberOfTalks>> countNumberOfTalks(List<tTalk> ttalkList) async {
   List<NumberOfTalks> talkN = [];
   List<String> talkDate = [];
-  List<String> nameList = searchName(ttalkList);
+  List<String> nameList = await searchName(ttalkList);
 
   for (int i=0; i < ttalkList.length; i++) {
     int n = talkDate.indexOf(DateFormat('yyyy-MM').format(ttalkList[i].time));
@@ -64,17 +80,54 @@ List<NumberOfTalks> countNumberOfTalks(List<tTalk> ttalkList) {
   }
 
   for (var m in talkN) {
-    print('\n${m.date.year}年${m.date.month}月 \n'
-      '${m.name1} : ${m.n1}件, ${m.name2} : ${m.n2}件');
+    if (m.name1 == nameList[1]) {
+      String tmpName1 = '';
+      int tmpN1 = 0;
+      tmpName1 = m.name1;
+      m.name1 = m.name2;
+      m.name2 = tmpName1;
+
+      tmpN1 = m.n1;
+      m.n1 = m.n2;
+      m.n2 = tmpN1;
+    }
   }
+
   return talkN;
 }
 
+List<int> sumOfTalks(List<NumberOfTalks> talkN) {
+  List<int> sum = [0, 0];
+  for (var m in talkN) {
+    sum[0] += m.n1;
+    sum[1] += m.n2;
+  }
+  print(sum);
+  return sum;
+}
+
+int countPeriod(List<tTalk> ttalkList) {
+  DateTime startTime = ttalkList[0].time;
+  DateTime endTime = ttalkList[ttalkList.length-1].time;
+
+  final Duration difference = endTime.difference(startTime);
 
 
+  return difference.inDays;
+}
+
+Future<List<int>> countNumberOfWords(List<tTalk> ttalkList) async {
+  List<int> wordN = [0, 0];
+  List<String> nameList = [];
+  nameList = await searchName(ttalkList);
+  for (var m in ttalkList) {
+    if (m.name == nameList[0]) {
+      wordN[0] += m.content.length;
+    } else {
+      wordN[1] += m.content.length;
+    }
+  }
 
 
-// pref
-// http://hono-wp.seesaa.net/article/451497045.html
-
-
+  return wordN;
+}

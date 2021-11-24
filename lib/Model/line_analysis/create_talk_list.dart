@@ -1,7 +1,7 @@
 import 'package:line_analytics_app/Model/line_analysis/line_analysis.dart';
 import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
 
-List<Talk> createTalkList(String strData) {
+Future<List<Talk>> createTalkList(String strData) async {
   // 返すリスト
   List<Talk> talkList = [];
 

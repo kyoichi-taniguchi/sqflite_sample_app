@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
+import 'package:line_analytics_app/Model/io/raed_assets_file.dart';
 import 'package:line_analytics_app/Model/line_analysis/change_date_time_type.dart';
 import 'package:line_analytics_app/Model/line_analysis/create_talk_list.dart';
 import 'package:line_analytics_app/Model/line_analysis/line_analysis.dart';
 import 'package:line_analytics_app/Model/line_analysis/talk_class.dart';
-import 'package:line_analytics_app/Model/database/talks_db_controller.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:icofont_flutter/icofont_flutter.dart';
 
-Future<String> getFileData(String path) async {
-  return await rootBundle.loadString(path);
-}
+
+
 
 
 class LineAnalysisView extends StatefulWidget {
@@ -22,109 +20,319 @@ class LineAnalysisView extends StatefulWidget {
 
 class _LineAnalysisViewState extends State<LineAnalysisView> {
 
-  List<Talk>?  talkList;
-  List<tTalk>? ttalkList;
-  List<NumberOfTalks> talkN = [];
+
+  List<Talk>? _talkList;
+  List<tTalk>? _ttalkList;
+  List<NumberOfTalks> _talkN = [];
+  List<int> _sumOfTalks = [0, 0];
+  int _talkPeriod = 0;
+  List<int> _wordN = [0, 0];
 
 
-  String _data = '';
-
-  String fileName1 = 'assets/line_data.txt';
-  String fileName2 = 'assets/[LINE] しのちゃんとのトーク.txt';
+  late String _data;
 
   bool isDone = false;
+  bool isLoading = false;
 
 
-  int page = 0;
-  TalksDb db = TalksDb();
-
+  int page = 1;
 
 
   @override
   Widget build(BuildContext context) {
 
-
-
-
-    getFileData(fileName1).then((value) {
-      setState(() {
-        _data = value;
-      });
-    });
-
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('LINE解析アプリ'),
+        backgroundColor: const Color.fromRGBO(25, 185, 2, 0.7),
+        title: const Text('LINE解析アプリ'),
         actions: <Widget>[
           IconButton(
-              onPressed: () {page = 1;},
-              icon: Icon(Icons.analytics)),
-          IconButton(onPressed: () {page = 0;}, icon: Icon(Icons.list)),
+              onPressed: () {
+                if (_ttalkList != null) {
+                  setState(() {
+                    page = 1;
+                  });
+                }
+              },
+              icon: const Icon(Icons.calendar_today)),
+          IconButton(onPressed: () {
+            setState(() {
+              page = 0;
+            });
+          }, icon: const Icon(Icons.grid_on_rounded)),
         ],
       ),
       body: Center(
-        child: switchWidget(page)),
+          child: switchWidget(page),
+      ),
       floatingActionButton: FloatingActionButton(
-        child: isDone ? Icon(Icons.done) : Icon(Icons.play_arrow),
+        backgroundColor: const Color.fromRGBO(25, 185, 2, 1),
+        child: isDone ?
+          const Icon(
+              Icons.done,
+          )
+            : const Icon(Icons.add),
         onPressed: loadButton,
       ),
     );
   }
 
+  Widget loadingView() {
+    if (!isLoading) {
+      return const Text('＋ボタンで解析したいトークを追加');
+    } else {
+      return const Text('解析中です\nしばらくお待ち下さい');
+    }
+  }
 
 
   Widget talkListBuilder(List<Talk>? talkList) {
-    if (ttalkList == null) {
-      return const Text('please tap');
+    if (_ttalkList == null) {
+      return loadingView();
     } else {
-      return ListView.builder(
-          itemCount: ttalkList!.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Text('${DateFormat('yyyy年MM月dd日HH:mm').format(ttalkList![index].time)} : '
-                '${ttalkList![index].name} : ${ttalkList![index].content}');
-          }
+      return GridView.count(
+          crossAxisCount: 2,
+        children: [
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                      '合計トーク数',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const Padding(padding: EdgeInsets.all(2)),
+                  Text(
+                      '友達 : ${_sumOfTalks[0]}件',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  Text(
+                      '自分 : ${_sumOfTalks[1]}件',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                    ),
+                  ),
+                ],
+            ),
+          ),
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                    '平均トーク数 / 日',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                    '友達 : ${_sumOfTalks[0] * 10 ~/ _talkPeriod / 10}件',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                    '自分 : ${_sumOfTalks[1] * 10 ~/ _talkPeriod / 10}件',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                    '合計文字数',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                    '友達 : ${_wordN[0]}文字',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                    '自分 : ${_wordN[1]}文字',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                const Text(
+                    '平均文字数 / 日',
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                    '友達 : ${_wordN[0] * 10 ~/ _talkPeriod / 10}文字',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Text(
+                    '自分 : ${_wordN[1] * 10 ~/ _talkPeriod / 10}文字',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       );
     }
   }
 
 
   Widget switchWidget(int page) {
-
-    if (page == 0) {
-      return talkListBuilder(talkList);
-    } else if (page == 1) {
-      return printNumberOfTalks(talkList!);
-    }
-    return const Text('no pages');
-  }
-
-  Widget printNumberOfTalks (List<Talk> talkList) {
-    //db.checkDb();
-    String n = '';
-
-
-    for (var m in talkN) {
-      n = n + '\n${m.date.year}年${m.date.month}月 \n'
-          '${m.name1} : ${m.n1}件, ${m.name2} : ${m.n2}件';
+    if (_talkList == null) {
+      return loadingView();
+    } else {
+      if (page == 0) {
+        return talkListBuilder(_talkList);
+      } else if (page == 1) {
+        return numberOfTalksListBuilder(_talkList!);
+      }
+      return const Text('no pages');
     }
 
-
-    return Text(n);
   }
 
+  Widget numberOfTalksListBuilder(List<Talk> talkList) {
 
-  void loadButton() {
+      return ListView.builder(
+        itemCount: _talkN.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    DateFormat('yyyy年MM月').format(_talkN[index].date),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      children: <Widget>[
+                        const Icon(
+                            IcoFontIcons.line,
+                            color: Color.fromRGBO(25, 185, 2, 1),
+                        ),
+                        const Padding(padding: EdgeInsets.fromLTRB(5, 0, 0, 0)),
+                        Text(
+                          '${_talkN[index].name1} : ${_talkN[index].n1}件',
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Padding(padding: EdgeInsets.all(5)),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                        '${_talkN[index].name2} : ${_talkN[index].n2}件',
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                        const Padding(padding: EdgeInsets.fromLTRB(5, 0, 0, 0)),
+                        const Icon(
+                            IcoFontIcons.line,
+                            color: Color.fromRGBO(25, 185, 2, 1)
+                        ),
+                    ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        );
 
-    if (!isDone) {
-      talkList = createTalkList(_data);
-      //db.createTable(talkList!);
-
-      ttalkList = changeListType(talkList!);
-      talkN = countNumberOfTalks(ttalkList!);
-      isDone = true;
+      return loadingView();
     }
-  }
+
+
+    loadButton() async {
+      List<Talk>? talkList;
+      List<tTalk>? ttalkList;
+      List<NumberOfTalks> talkN = [];
+      List<int> sum = [0, 0];
+      int talkPeriod = 0;
+      List<int> wordN = [0, 0];
+      String data = '';
+      setState(() {
+        isLoading = true;
+      });
+
+      if (!isDone) {
+        data = await FileController().readFile();
+
+        talkList = await createTalkList(data);
+        //db.createTable(talkList!);
+
+        ttalkList = await changeListType(talkList);
+        talkN = await countNumberOfTalks(ttalkList);
+        sum = sumOfTalks(talkN);
+        talkPeriod = countPeriod(ttalkList);
+        wordN = await countNumberOfWords(ttalkList);
+        setState(() {
+          _data = data;
+          _talkList = talkList;
+          _ttalkList = ttalkList;
+          _talkN = talkN;
+          _sumOfTalks = sum;
+          _talkPeriod = talkPeriod;
+          _wordN = wordN;
+          isLoading = false;
+          isDone = true;
+        });
+      }
+    }
 
 }
-
